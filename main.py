@@ -16,7 +16,7 @@ solr_conn = connect_to_platform('http://localhost:8983/solr/main_core')
 logger.info("Connect to Apache Solr database finished")
 
 logger.info("Start data searching in Apache Solr database")
-results = solr_conn.search(q='*:*', rows=5)
+results = solr_conn.search(q='*:*', rows=2147483647)
 logger.info("Data searching has just ended")
 
 data = {}
