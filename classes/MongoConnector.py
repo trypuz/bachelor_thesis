@@ -5,7 +5,6 @@ from config import PLATO_MONGO_DB_NAME, PLATO_MONGO_COLLECTIONS
 from classes.EntryModel import EntryModel
 from classes.StatsModel import StatsModel
 from classes.NerResultsModel import NerResultsModel
-from classes.DbpediaTypeModel import DbpediaTypeModel
 
 logger = logging.getLogger(__name__)
 
@@ -51,11 +50,12 @@ class MongoConnector:
         logger.debug("All NER results retrieved")
         return ner_results
 
+    def get_overall_stats_by_id(self, stats_id):
+        overall_stats = self.collections[PLATO_MONGO_COLLECTIONS["STATS"]].find_one({"stats_id": stats_id})
+        return overall_stats
+
     def add_ner_results_for_single_entry_to_collection(self, ner_results_model: NerResultsModel):
         self.collections[PLATO_MONGO_COLLECTIONS["NER"]].insert(vars(ner_results_model))
 
     def add_stats_to_collection(self, stats_model: StatsModel):
         self.collections[PLATO_MONGO_COLLECTIONS["STATS"]].insert_one(vars(stats_model))
-
-    def add_dbpedia_type_to_collection(self, dbpedia_type_model: DbpediaTypeModel):
-        self.collections[PLATO_MONGO_COLLECTIONS["DBPEDIA_TYPES"]].insert_one(vars(dbpedia_type_model))

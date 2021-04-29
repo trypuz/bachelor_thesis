@@ -2,15 +2,8 @@ PLATO_ROOT_URL = "https://plato.stanford.edu"
 PLATO_TOC_URL = f"{PLATO_ROOT_URL}/contents.html"
 PLATO_LOG_FILE_NAME = "logs/plato"
 PLATO_LOG_FILE_EXTENSION = "log"
-PLATO_NLP_PIPELINE = "en_core_web_sm"
+PLATO_NLP_PIPELINE = "en_core_web_lg"
 PLATO_DBPEDIA_URL = "http://dbpedia.org/sparql"
-PLATO_SPARQL_QUERY_FOR_GETTING_TYPE_PROPS = """
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?prop (COUNT(DISTINCT ?instance) AS ?count) WHERE {{
-    ?instance a {0};
-    ?prop ?name
-}} ORDER BY DESC(?count)
-"""
 PLATO_NER_ALLOWED_TYPES = [
     'PERSON',
     'ORG',
@@ -45,8 +38,11 @@ PLATO_MONGO_COLLECTIONS = {
     "ENTRIES": "entries",
     "NER": "ner_results",
     "STATS": "stats",
-    "DBPEDIA_TYPES": "dbpedia_types"
 }
 PLATO_STATS_IDS = {
-    "OVERALL_NER_STATS": "overall_ner_stats"
+    "OVERALL_NER_TYPE_STATS": "overall_ner_type_stats",
+    "OVERALL_NER_COUNT_STATS": "overall_ner_count_stats",
+    "OVERALL_WORDS_COUNT_STATS": "overall_words_count_stats",
+    "OVERALL_NER_COVERAGE_STATS": "overall_ner_coverage_stats",
+    "OVERALL_NER_OCCURRENCES_STATS": "overall_ner_occurrences_stats"
 }

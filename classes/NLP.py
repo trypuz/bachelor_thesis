@@ -1,5 +1,4 @@
 import spacy
-import re
 import logging
 
 from config import PLATO_NLP_PIPELINE
@@ -9,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class NLP:
     def __init__(self, text):
-        self._text = NLP.remove_special_chars(text)
+        self._text = text
         self._nlp = spacy.load(PLATO_NLP_PIPELINE)
         self._doc = self._nlp(self._text)
 
@@ -29,6 +28,3 @@ class NLP:
 
         return ner_info
 
-    @staticmethod
-    def remove_special_chars(text):
-        return re.sub(r'[^0-9a-zA-Z.]', ' ', text)
