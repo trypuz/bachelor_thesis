@@ -20,6 +20,9 @@ class StatsModel:
             for ner_results_key, ner_results_value in ner_results["ner_stats"]["ner_type_stats"].items():
                 overall_ner_type_stats[ner_results_key] += ner_results_value
 
+        overall_ner_type_stats = dict(
+            sorted(overall_ner_type_stats.items(), key=operator.itemgetter(1), reverse=True))
+
         return overall_ner_type_stats
 
     @staticmethod
@@ -32,17 +35,17 @@ class StatsModel:
         return overall_ner_count_stats
 
     @staticmethod
-    def calculate_overall_words_count_stats(entries_list):
-        overall_words_count_stats = 0
+    def calculate_overall_chars_count_stats(entries_list):
+        overall_chars_count_stats = 0
 
         for entry in entries_list:
-            overall_words_count_stats += entry["words_count"]
+            overall_chars_count_stats += entry["chars_count"]
 
-        return overall_words_count_stats
+        return overall_chars_count_stats
 
     @staticmethod
-    def calculate_overall_ner_coverage_stats(overall_ner_count_stats, overall_word_count_stats):
-        overall_ner_coverage = overall_ner_count_stats / overall_word_count_stats
+    def calculate_overall_ner_coverage_stats(overall_ner_count_stats, overall_chars_count_stats):
+        overall_ner_coverage = overall_ner_count_stats / overall_chars_count_stats
         return round(overall_ner_coverage, 3)
 
     @staticmethod

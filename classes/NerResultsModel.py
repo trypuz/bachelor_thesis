@@ -7,9 +7,9 @@ logger = logging.getLogger(__name__)
 
 
 class NerResultsModel:
-    def __init__(self, entry_id, text_with_ner_extracted, words_count):
+    def __init__(self, entry_id, text_with_ner_extracted, chars_count):
         self.entry_id = entry_id
-        self.words_count = words_count
+        self.chars_count = chars_count
         self.ner_results = {}
         self.ner_stats = {}
 
@@ -34,7 +34,9 @@ class NerResultsModel:
             ner_type_stats[ner_type] = 0
 
         for ner_entity in self.ner_results:
-            ner_count += len(ner_entity["text"].split())
+            for ner_entity_text_word in ner_entity["text"].split():
+                ner_count += len(ner_entity_text_word)
+
             modified_ner_entity_text = ner_entity["text"].replace('.', '_').replace('$', 'DOLLAR-')
             ner_occurrences_key_name = f"{modified_ner_entity_text}__{ner_entity['label']}"
             ner_occurrences[ner_occurrences_key_name] = (ner_occurrences[ner_occurrences_key_name] + 1) if (
@@ -47,10 +49,10 @@ class NerResultsModel:
         self.ner_stats = {
             "ner_type_stats": ner_type_stats,
             "ner_count": ner_count,
-            "ner_coverage": round(ner_count / self.words_count, 3),
+            "ner_coverage": round(ner_count / self.chars_count, 3),
             "ner_occurrences": ner_occurrences
         }
 
-        del self.words_count
+        del self.chars_count
 
         logger.debug("NER stats for single entry calculated")

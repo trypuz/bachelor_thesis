@@ -32,11 +32,16 @@ def get_entry_model(entry_id, entry_soup_handler, entry_link):
     title = entry_soup_handler.h1.get_text()
     preamble = remove_extra_whitespaces(entry_soup_handler.find(id="preamble").get_text())
     main_text = remove_extra_whitespaces(entry_soup_handler.find(id="main-text").get_text())
-    words_count = len(preamble.split()) + len(main_text.split())
+
+    temp_text = preamble + main_text
+    chars_count = 0
+
+    for word in temp_text.split():
+        chars_count += len(word)
 
     logger.debug(f"Info about <{entry_link.name}> retrieved")
 
-    return EntryModel(entry_id=entry_id, title=title, preamble=preamble, main_text=main_text, words_count=words_count)
+    return EntryModel(entry_id=entry_id, title=title, preamble=preamble, main_text=main_text, chars_count=chars_count)
 
 
 def create_all_entry_models(mongo_connector: MongoConnector, entry_links):
@@ -52,7 +57,7 @@ def create_all_ner_results(mongo_connector: MongoConnector):
 
     for entry in entries_from_db:
         text_for_nlp = NLP(entry["preamble"] + entry["main_text"])
-        ner_results_for_entry = NerResultsModel(entry["entry_id"], text_for_nlp.get_ner_info(), entry["words_count"])
+        ner_results_for_entry = NerResultsModel(entry["entry_id"], text_for_nlp.get_ner_info(), entry["chars_count"])
         mongo_connector.add_ner_results_for_single_entry_to_collection(ner_results_for_entry)
 
 
@@ -84,23 +89,23 @@ def create_overall_ner_count_stats(mongo_connector: MongoConnector):
     mongo_connector.add_stats_to_collection(overall_ner_count_stats_model)
 
 
-def create_overall_words_count_stats(mongo_connector: MongoConnector):
+def create_overall_chars_count_stats(mongo_connector: MongoConnector):
     entries_results_from_db = mongo_connector.get_all_entries_from_collection()
     entries_results_from_db = [document for document in entries_results_from_db]
 
-    overall_words_count_stats_func = StatsModel.calculate_overall_words_count_stats(entries_results_from_db)
-    overall_words_count_stats_model = generate_stats_model(PLATO_STATS_IDS["OVERALL_WORDS_COUNT_STATS"],
-                                                           overall_words_count_stats_func)
+    overall_chars_count_stats_func = StatsModel.calculate_overall_chars_count_stats(entries_results_from_db)
+    overall_chars_count_stats_model = generate_stats_model(PLATO_STATS_IDS["OVERALL_CHARS_COUNT_STATS"],
+                                                           overall_chars_count_stats_func)
 
-    mongo_connector.add_stats_to_collection(overall_words_count_stats_model)
+    mongo_connector.add_stats_to_collection(overall_chars_count_stats_model)
 
 
 def create_overall_ner_coverage_stats(mongo_connector: MongoConnector):
     overall_ner_count_stats = mongo_connector.get_overall_stats_by_id(PLATO_STATS_IDS["OVERALL_NER_COUNT_STATS"])
-    overall_words_count_stats = mongo_connector.get_overall_stats_by_id(PLATO_STATS_IDS["OVERALL_WORDS_COUNT_STATS"])
+    overall_chars_count_stats = mongo_connector.get_overall_stats_by_id(PLATO_STATS_IDS["OVERALL_CHARS_COUNT_STATS"])
 
     overall_ner_coverage_stats_func = StatsModel.calculate_overall_ner_coverage_stats(overall_ner_count_stats["value"],
-                                                                                      overall_words_count_stats[
+                                                                                      overall_chars_count_stats[
                                                                                           "value"])
     overall_ner_coverage_stats_model = generate_stats_model(PLATO_STATS_IDS["OVERALL_NER_COVERAGE_STATS"],
                                                             overall_ner_coverage_stats_func)
@@ -117,6 +122,36 @@ def create_overall_ner_occurrences_stats(mongo_connector: MongoConnector):
                                                                overall_ner_occurrences_stats_func)
 
     mongo_connector.add_stats_to_collection(overall_ner_occurrences_stats_model)
+
+
+def find_entry_id_with_biggest_ner_coverage(mongo_connector: MongoConnector):
+    ner_results_from_db = mongo_connector.get_all_ner_results_from_collection()
+    ner_results_from_db = [document for document in ner_results_from_db]
+
+    biggest_coverage = 0
+    biggest_coverage_entry_id = -1
+
+    for ner_results in ner_results_from_db:
+        if ner_results["ner_stats"]["ner_coverage"] > biggest_coverage:
+            biggest_coverage = ner_results["ner_stats"]["ner_coverage"]
+            biggest_coverage_entry_id = ner_results["entry_id"]
+
+    return biggest_coverage_entry_id
+
+
+def find_entry_id_with_smallest_ner_coverage(mongo_connector: MongoConnector):
+    ner_results_from_db = mongo_connector.get_all_ner_results_from_collection()
+    ner_results_from_db = [document for document in ner_results_from_db]
+
+    smallest_coverage = 999
+    smallest_coverage_entry_id = -1
+
+    for ner_results in ner_results_from_db:
+        if ner_results["ner_stats"]["ner_coverage"] < smallest_coverage:
+            smallest_coverage = ner_results["ner_stats"]["ner_coverage"]
+            smallest_coverage_entry_id = ner_results["entry_id"]
+
+    return smallest_coverage_entry_id
 
 
 def find_all_entries_with_url():

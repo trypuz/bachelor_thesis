@@ -42,7 +42,7 @@ PLATO_MONGO_COLLECTIONS = {
 PLATO_STATS_IDS = {
     "OVERALL_NER_TYPE_STATS": "overall_ner_type_stats",
     "OVERALL_NER_COUNT_STATS": "overall_ner_count_stats",
-    "OVERALL_WORDS_COUNT_STATS": "overall_words_count_stats",
+    "OVERALL_CHARS_COUNT_STATS": "overall_chars_count_stats",
     "OVERALL_NER_COVERAGE_STATS": "overall_ner_coverage_stats",
     "OVERALL_NER_OCCURRENCES_STATS": "overall_ner_occurrences_stats"
 }

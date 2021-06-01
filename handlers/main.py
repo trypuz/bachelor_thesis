@@ -1,7 +1,7 @@
 import logging
 
 from helpers.plato_helper import create_overall_ner_type_stats, create_all_ner_results, create_all_entry_models, \
-    create_overall_ner_count_stats, create_overall_words_count_stats, create_overall_ner_coverage_stats, \
+    create_overall_ner_count_stats, create_overall_chars_count_stats, create_overall_ner_coverage_stats, \
     create_overall_ner_occurrences_stats
 
 logger = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ def on_overall_stats_require_update(mongo_connector):
     logger.info("Starting update overall stats")
     create_overall_ner_type_stats(mongo_connector)
     create_overall_ner_count_stats(mongo_connector)
-    create_overall_words_count_stats(mongo_connector)
+    create_overall_chars_count_stats(mongo_connector)
     create_overall_ner_coverage_stats(mongo_connector)
     create_overall_ner_occurrences_stats(mongo_connector)
     logger.info("Overall stats updated")
